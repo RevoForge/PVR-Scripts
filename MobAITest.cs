@@ -28,7 +28,8 @@ public class MobAITest : PSharpBehaviour
     private bool hasWanderPosition = false;
     private float wanderTimer = 0f;
     private float stopTimer = 0f;
-    public float timeTilWander = 10f;
+    public float minTimeTilWander = 10f;
+    public float maxTimeTilWander = 20f;
     public float dodgeDistance = 1.0f;
     public float dodgeSpeed = 1.0f;
 
@@ -165,7 +166,7 @@ public class MobAITest : PSharpBehaviour
                // Debug.Log($"Player out of range of {transform.name}");
             }
             // No player in range so start wandering if the timer says so
-            else if (!hasTarget && !hasWanderPosition && wanderTimer >= timeTilWander)
+            else if (!hasTarget && !hasWanderPosition && wanderTimer >= Random.Range(minTimeTilWander, maxTimeTilWander))
             {
                // Debug.Log($"{transform.name} has started wandering");
                 StartCoroutine(StartWander());
@@ -174,7 +175,7 @@ public class MobAITest : PSharpBehaviour
                 stopTimer = 0;
             }
             // Wandering stop logic and anim control
-            if (hasWanderPosition && agent.remainingDistance <= agent.stoppingDistance && stopTimer >= 1)
+            if (hasWanderPosition && agent.remainingDistance <= agent.stoppingDistance && stopTimer >= 2) // stoptimer >= 1 causes issues leave at 2 or more
             {
                 hasWanderPosition = false;
                 walk = false;
@@ -200,7 +201,7 @@ public class MobAITest : PSharpBehaviour
     private IEnumerator StartWander()
     {
         anim.SetTrigger("Walk");
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.25f);
         walk = true ;
         /*
         while (!anim.GetCurrentAnimatorStateInfo(0).IsName("walk"))
