@@ -83,7 +83,7 @@ public class RevoStaticMethodHolder : PSharpBehaviour
             {
                 throw new IndexOutOfRangeException("Array is full.");
             }
-            Debug.Log($"Player {value} added to the holding item array");
+            //Debug.Log($"Player {value} added to the holding item array");
             _data[_head++] = value;
         }
 
@@ -105,7 +105,7 @@ public class RevoStaticMethodHolder : PSharpBehaviour
             if (index >= 0)
             {
                 RemoveAtIndex(index);
-                Debug.Log($"Player {element} removed from the holding item array");
+                //Debug.Log($"Player {element} removed from the holding item array");
             }
         }
 
