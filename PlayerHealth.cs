@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using PVR.PSharp;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PlayerHealth : PSharpBehaviour
 {
@@ -12,12 +13,13 @@ public class PlayerHealth : PSharpBehaviour
     private AudioSource audioSource;
     public AudioClip audioClipHit;
     public AudioClip audioClipDeath;
-
+    public Slider healthSlider;
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
         localPlayer = PSharpPlayer.LocalPlayer;
         healthPool = startingHealthPool;
+        healthSlider.maxValue = startingHealthPool;
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -37,7 +39,15 @@ public class PlayerHealth : PSharpBehaviour
 
     private void Update()
     {
-        transform.position = localPlayer.GetPosition();
+        if (healthPool != healthSlider.value)
+        {
+            healthSlider.value = healthPool;
+        }
+        Quaternion headRotation = localPlayer.GetBoneRotation(HumanBodyBones.Head);
+        Quaternion zeroedRotation = Quaternion.Euler(0, headRotation.eulerAngles.y, 0);
+        Vector3 playerPosition = localPlayer.GetPosition();
+        Vector3 adjustedPosition = new(playerPosition.x, playerPosition.y + 1, playerPosition.z);
+        transform.SetPositionAndRotation(adjustedPosition, zeroedRotation);
     }
 
     private void PlayerDeath()
