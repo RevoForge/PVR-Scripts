@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using PVR.PSharp;
 using UnityEngine.AI;
+using System;
 
 public class RevoStaticMethodHolder : PSharpBehaviour
 { 
@@ -12,7 +13,7 @@ public class RevoStaticMethodHolder : PSharpBehaviour
             NavMeshHit hit;
             do
             {
-                randDir = transform.position + Random.insideUnitSphere * dist;
+                randDir = transform.position + UnityEngine.Random.insideUnitSphere * dist;
             }
             while (!NavMesh.SamplePosition(randDir, out hit, dist, NavMesh.AllAreas) || Vector3.Distance(transform.position, hit.position) < minDist);
             return hit.position;
@@ -23,7 +24,7 @@ public class RevoStaticMethodHolder : PSharpBehaviour
             Vector3 randDir;
             // Get the forward direction of the character
             Vector3 forwardDir = transform.forward;
-            float forwardAngle = Random.Range(-Mathf.PI / 2f, Mathf.PI / 2f);
+            float forwardAngle = UnityEngine.Random.Range(-Mathf.PI / 2f, Mathf.PI / 2f);
 
             Vector3 randomForwardDirection = Quaternion.Euler(0f, forwardAngle * Mathf.Rad2Deg, 0f) * forwardDir;
             randDir = transform.position + randomForwardDirection * dist;
@@ -34,7 +35,7 @@ public class RevoStaticMethodHolder : PSharpBehaviour
                 return hit.position;
             }
             // If no valid forward position is found, attempt to find a valid backward position
-            float backwardAngle = Random.Range(Mathf.PI / 2f, Mathf.PI * 1.5f);
+            float backwardAngle = UnityEngine.Random.Range(Mathf.PI / 2f, Mathf.PI * 1.5f);
 
             Vector3 randomBackwardDirection = Quaternion.Euler(0f, backwardAngle * Mathf.Rad2Deg, 0f) * forwardDir;
             randDir = transform.position + randomBackwardDirection * dist;
@@ -70,5 +71,53 @@ public class RevoStaticMethodHolder : PSharpBehaviour
         }
 
     }
+    public static class SharedByteArray
+    {
+        [PSharpSynced]
+        private static readonly byte[] _data = new byte[16];
+        private static int _head = 0; 
+
+        public static void Add(byte value)
+        {
+            if (_head == _data.Length)
+            {
+                throw new IndexOutOfRangeException("Array is full.");
+            }
+            Debug.Log($"Player {value} added to the holding item array");
+            _data[_head++] = value;
+        }
+
+        public static bool Contains(byte element)
+        {
+            for (int i = 0; i < _head; i++)
+            {
+                if (_data[i] == element)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static void Remove(byte element)
+        {
+            int index = Array.IndexOf(_data, element, 0, _head);
+            if (index >= 0)
+            {
+                RemoveAtIndex(index);
+                Debug.Log($"Player {element} removed from the holding item array");
+            }
+        }
+
+        private static void RemoveAtIndex(int index)
+        {
+            if (index >= 0 && index < _head)
+            {
+                Array.Copy(_data, index + 1, _data, index, _head - index - 1);
+                _head--;
+            }
+        }
+    }
+
 
 }
