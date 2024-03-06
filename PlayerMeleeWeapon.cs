@@ -5,9 +5,10 @@ public class PlayerMeleeWeapon : PSharpBehaviour
 {
 	public int damage = 10;
     private MobTakeDamage currentTarget;
+    private AudioSource audioSource;
 	private void Start()
 	{
-
+        audioSource = GetComponent<AudioSource>();
 	}
     private void OnTriggerEnter(Collider other)
     {
@@ -15,6 +16,7 @@ public class PlayerMeleeWeapon : PSharpBehaviour
         if (currentTarget != null)
         {
             currentTarget.IncomingDamage(damage);
+            audioSource.Play();
         }
         currentTarget = null;
     }

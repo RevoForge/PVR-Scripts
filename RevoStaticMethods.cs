@@ -49,6 +49,25 @@ public class RevoStaticMethodHolder : PSharpBehaviour
             return transform.position;
         }
 
+        public static GameObject ActivateFirstInactiveChild(Transform objectTransform)
+        {
+            // Iterate through the children of the old parent
+            for (int i = 0; i < objectTransform.childCount; i++)
+            {
+                GameObject child = objectTransform.GetChild(i).gameObject;
+
+                // Check if the child is inactive
+                if (!child.activeSelf)
+                {
+                    // Set the child active
+                    child.SetActive(true);
+                    
+                    // Break out of the loop after activating the first inactive child
+                    return child;
+                }
+            }
+            return null;
+        }
 
     }
 

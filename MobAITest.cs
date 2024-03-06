@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using PVR.PSharp;
 using UnityEngine.AI;
-using static RevoStaticMethodHolder;
+using static RevoStaticMethodHolder.RevoStaticMethods;
 using System.Collections;
 
 
@@ -31,6 +31,10 @@ public class MobAITest : PSharpBehaviour
     public float timeTilWander = 10f;
     public float dodgeDistance = 1.0f;
     public float dodgeSpeed = 1.0f;
+
+    // temp variables
+    private bool canAttack = true;
+    public float timeBetweenAttacks = 1.5f;
 
     private void Start()
 	{
@@ -137,8 +141,17 @@ public class MobAITest : PSharpBehaviour
                     // Debug.Log($"{transform.name} has started walking towards Target");
                 }
                 // At Target so Attack
+                /*
                 else if (!walk && !anim.GetCurrentAnimatorStateInfo(0).IsName("attack"))
                 {
+                    anim.SetTrigger("Attack");
+                    // Debug.Log($"{transform.name} has started attacking Target");
+                }
+                */
+                else if (!walk && canAttack)
+                {
+                    canAttack = false;
+                    StartCoroutine(ResetAttack());
                     anim.SetTrigger("Attack");
                     // Debug.Log($"{transform.name} has started attacking Target");
                 }
@@ -179,27 +192,35 @@ public class MobAITest : PSharpBehaviour
             }
         }
     }
+    private IEnumerator ResetAttack()
+    {
+        yield return new WaitForSeconds(timeBetweenAttacks);
+        canAttack = true;
+    }
     private IEnumerator StartWander()
     {
         anim.SetTrigger("Walk");
+        yield return new WaitForSeconds(1);
         walk = true ;
+        /*
         while (!anim.GetCurrentAnimatorStateInfo(0).IsName("walk"))
         {
             yield return null;
            // do nothing
         }
-        SetAIDestination(RevoStaticMethods.CalculateRandomForwardPosition(transform, MaxWanderDistance, MinWanderDistance));
+        */
+        SetAIDestination(CalculateRandomForwardPosition(transform, MaxWanderDistance, MinWanderDistance));
     }
     public void SetAIDestination(Vector3 target)
     {
         agent.SetDestination(target);
-        /*
+        /* // Waiting on Whitelist
         if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
         {
             currentRetries++;
             if (currentRetries <= MaxRetries)
             {
-                SetAIDestination(RevoStaticMethods.CalculateRandomPosition(transform, MaxWanderDistance, MinWanderDistance));
+                SetAIDestination(CalculateRandomPosition(transform, MaxWanderDistance, MinWanderDistance));
             }
             else
             {
