@@ -2,17 +2,18 @@
 using PVR.PSharp;
 using static RevoStaticMethodHolder.SharedByteArray;
 using PVR.CCK.Worlds.Components;
+using UnityEngine.InputSystem;
 
 public class Custompickuptest : PSharpBehaviour
 {
 	private bool pickup = false;
 	public Vector3 rotationAdjustment;
     private PSharpPlayer player;
-
    
     public override void OnInteract()
 	{
         player = PSharpPlayer.LocalPlayer;
+        
         if (!Contains(player.PlayerID))
         {
             Add(player.PlayerID);

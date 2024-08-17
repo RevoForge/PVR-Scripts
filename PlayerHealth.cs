@@ -14,10 +14,10 @@ public class PlayerHealth : PSharpBehaviour
     public AudioClip audioClipHit;
     public AudioClip audioClipDeath;
     public Slider healthSlider;
+    private bool localJoined = false;
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        localPlayer = PSharpPlayer.LocalPlayer;
         healthPool = startingHealthPool;
         healthSlider.maxValue = startingHealthPool;
     }
@@ -36,18 +36,37 @@ public class PlayerHealth : PSharpBehaviour
         }
         mobDMG = null;
     }
+    public override void OnPlayerJoined(PSharpPlayer player)
+    {
+        if (player == PSharpPlayer.LocalPlayer)
+        {
+            localPlayer = player;
+            localJoined = true;
+        }
+    }
+    public override void OnPlayerLeft(PSharpPlayer player)
+    {
+        if (player == PSharpPlayer.LocalPlayer)
+        {
+            localJoined = false;
+        }
+    }
 
     private void Update()
     {
-        if (healthPool != healthSlider.value)
+        if (localJoined)
         {
-            healthSlider.value = healthPool;
+            if (healthPool != healthSlider.value)
+            {
+                healthSlider.value = healthPool;
+            }
+            Quaternion headRotation = localPlayer.GetBoneRotation(HumanBodyBones.Head);
+            Quaternion zeroedRotation = Quaternion.Euler(0, headRotation.eulerAngles.y, 0);
+            Vector3 playerPosition = localPlayer.GetPosition();
+            Vector3 adjustedPosition = new(playerPosition.x, playerPosition.y + 1, playerPosition.z);
+            transform.SetPositionAndRotation(adjustedPosition, zeroedRotation);
         }
-        Quaternion headRotation = localPlayer.GetBoneRotation(HumanBodyBones.Head);
-        Quaternion zeroedRotation = Quaternion.Euler(0, headRotation.eulerAngles.y, 0);
-        Vector3 playerPosition = localPlayer.GetPosition();
-        Vector3 adjustedPosition = new(playerPosition.x, playerPosition.y + 1, playerPosition.z);
-        transform.SetPositionAndRotation(adjustedPosition, zeroedRotation);
+
     }
 
     private void PlayerDeath()
